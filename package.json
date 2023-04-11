@@ -7,7 +7,7 @@
     "typescript": "5.x"
   },
   "name": "package-utilities",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "dependencies": {
     "glob": "10.x"
   },

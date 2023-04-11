@@ -1,0 +1,23 @@
+{
+  "devDependencies": {
+    "@types/node": "18.x",
+    "eslint": "8.x",
+    "prettier": "2.x",
+    "ts-node": "10.x",
+    "typescript": "5.x"
+  },
+  "name": "package-utilities",
+  "version": "0.0.1",
+  "dependencies": {
+    "glob": "10.x"
+  },
+  "scripts": {
+    "build:es": "rm -rfv es && npx tsc --module ESNext --outDir es",
+    "test": "npx tsc && yarn run build:es && node . --set-es-paths --es-folder es --include \"*.js\""
+  },
+  "bin": "./index.js",
+  "browser": {
+    "./index.js": "./es/index.js",
+    "./getString.js": "./es/getString.js"
+  }
+}

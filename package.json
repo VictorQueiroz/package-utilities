@@ -21,7 +21,7 @@
     "./getString.js": "./es/getString.js"
   },
   "files": [
-    "*.js",
-    "*.d.ts"
+    "es/**/*.{js,d.ts,map}",
+    "*.{js,d.ts,map}"
   ]
 }

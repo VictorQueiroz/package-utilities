@@ -19,5 +19,9 @@
   "browser": {
     "./index.js": "./es/index.js",
     "./getString.js": "./es/getString.js"
-  }
+  },
+  "files": [
+    "*.js",
+    "*.d.ts"
+  ]
 }

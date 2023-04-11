@@ -32,9 +32,11 @@ async function setEsPaths(args: string[]) {
   let inOutPackageJsonFile =
     getPath(args, "--package-json-file") ??
     path.resolve(process.cwd(), "package.json");
-  let packageJson: Record<string, unknown> = JSON.parse(
-    await fs.promises.readFile(inOutPackageJsonFile, "utf8")
+  const stringifiedPackageJson = await fs.promises.readFile(
+    inOutPackageJsonFile,
+    "utf8"
   );
+  let packageJson: Record<string, unknown> = JSON.parse(stringifiedPackageJson);
   /**
    * reset browser
    */
@@ -55,9 +57,13 @@ async function setEsPaths(args: string[]) {
     };
   }
 
+  const lastCharacter =
+    stringifiedPackageJson[stringifiedPackageJson.length - 1] === "\n"
+      ? "\n"
+      : "";
   await fs.promises.writeFile(
     inOutPackageJsonFile,
-    JSON.stringify(packageJson, null, 2)
+    `${JSON.stringify(packageJson, null, 2)}${lastCharacter}`
   );
 }
 

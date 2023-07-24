@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 import * as glob from "glob";
-import getString from "./getString";
 import path from "path";
 import fs from "fs";
 import assert from "assert";
+import { getNamedArgument, getString } from "cli-argument-helper";
 
 function getPath(args: string[], name: string) {
-  let value = getString(args, name);
+  let value = getNamedArgument(args, name, getString);
   if (value !== null) {
     if (!path.isAbsolute(value)) {
       value = path.resolve(process.cwd(), value);
@@ -16,17 +16,27 @@ function getPath(args: string[], name: string) {
   return value;
 }
 
+function getPaths(args: string[], name: string) {
+  const maybePattern = getPath(args, name);
+  if (maybePattern !== null) {
+    if (glob.hasMagic(maybePattern)) {
+      return glob.sync(maybePattern);
+    }
+    return [maybePattern];
+  }
+  return null;
+}
+
 // --es-folder ./es --include "src/**/*.js"
 async function setEsPaths(args: string[]) {
-  const includeFiles = new Array<string>();
-  let includePattern: string | null;
-  do {
-    includePattern = getPath(args, "--include");
-    if (includePattern !== null) {
-      includeFiles.push(...glob.sync(includePattern));
+  const includeFiles = new Set(getPaths(args, "--include"));
+  const excludeFiles = getPaths(args, "--exclude");
+  assert.strict.ok(includeFiles !== null && includeFiles.size > 0);
+  if (excludeFiles) {
+    for (const e of excludeFiles) {
+      includeFiles.delete(e);
     }
-  } while (includePattern !== null);
-  assert.strict.ok(includeFiles.length > 0);
+  }
   const esFolder = getPath(args, "--es-folder");
   assert.strict.ok(esFolder !== null);
   let inOutPackageJsonFile =
@@ -40,14 +50,15 @@ async function setEsPaths(args: string[]) {
   /**
    * reset browser
    */
-  packageJson["browser"] = {};
+  const browser: Record<string, string> = {};
   for (const f of includeFiles) {
     const originalFileRelativePath = f.replace(
-      new RegExp(`^${process.cwd()}/`),
+      new RegExp(`^${process.cwd()}/?`),
       ""
     );
-    const esEquivalent = `es/${originalFileRelativePath}`;
-    const browser = packageJson["browser"] as Record<string, string>;
+    const esEquivalent = `${path.basename(
+      esFolder
+    )}/${originalFileRelativePath}`;
     packageJson = {
       ...packageJson,
       browser: {

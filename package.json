@@ -7,19 +7,19 @@
     "typescript": "5.x"
   },
   "name": "pkg-utilities",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "dependencies": {
     "cli-argument-helper": "^0.0.8",
     "glob": "10.x"
   },
   "scripts": {
+    "prepublishOnly": "yarn run test",
     "build:es": "rm -rfv es && npx tsc --module ESNext --outDir __es__",
     "test": "npx tsc && yarn run build:es && node . --set-es-paths --es-folder __es__ --include index.js"
   },
   "bin": "./index.js",
   "browser": {
-    "./index.js": "./es/index.js",
-    "./getString.js": "./es/getString.js"
+    "./index.js": "./__es__/index.js"
   },
   "files": [
     "es/**/*.{js,d.ts,map}",

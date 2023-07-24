@@ -29,14 +29,29 @@ function getPaths(args: string[], name: string) {
 
 // --es-folder ./es --include "src/**/*.js"
 async function setEsPaths(args: string[]) {
-  const includeFiles = new Set(getPaths(args, "--include"));
-  const excludeFiles = getPaths(args, "--exclude");
-  assert.strict.ok(includeFiles !== null && includeFiles.size > 0);
-  if (excludeFiles) {
-    for (const e of excludeFiles) {
-      includeFiles.delete(e);
+  let includeFiles = new Set<string>();
+  let lastFiles: string[] | null;
+  do {
+    lastFiles = getPaths(args, "--include");
+    if (lastFiles) {
+      includeFiles = new Set([...lastFiles, ...includeFiles]);
     }
-  }
+  } while (lastFiles !== null);
+  /**
+   * exclude undesired files
+   */
+  do {
+    lastFiles = getPaths(args, "--exclude");
+    if (lastFiles) {
+      for (const e of lastFiles) {
+        includeFiles.delete(e);
+      }
+    }
+  } while (lastFiles !== null);
+  /**
+   * make sure there is at least one file included
+   */
+  assert.strict.ok(includeFiles.size > 0);
   const esFolder = getPath(args, "--es-folder");
   assert.strict.ok(esFolder !== null);
   let inOutPackageJsonFile =
@@ -50,7 +65,7 @@ async function setEsPaths(args: string[]) {
   /**
    * reset browser
    */
-  const browser: Record<string, string> = {};
+  let browser: Record<string, string> = {};
   for (const f of includeFiles) {
     const originalFileRelativePath = f.replace(
       new RegExp(`^${process.cwd()}/?`),
@@ -59,12 +74,13 @@ async function setEsPaths(args: string[]) {
     const esEquivalent = `${path.basename(
       esFolder
     )}/${originalFileRelativePath}`;
+    browser = {
+      ...browser,
+      [`./${originalFileRelativePath}`]: `./${esEquivalent}`,
+    };
     packageJson = {
       ...packageJson,
-      browser: {
-        ...browser,
-        [`./${originalFileRelativePath}`]: `./${esEquivalent}`,
-      },
+      browser,
     };
   }
 

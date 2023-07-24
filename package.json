@@ -7,7 +7,7 @@
     "typescript": "5.x"
   },
   "name": "pkg-utilities",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "dependencies": {
     "cli-argument-helper": "^0.0.8",
     "glob": "10.x"

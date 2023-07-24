@@ -6,14 +6,15 @@
     "ts-node": "10.x",
     "typescript": "5.x"
   },
-  "name": "package-utilities",
-  "version": "0.0.6",
+  "name": "pkg-utilities",
+  "version": "0.0.8",
   "dependencies": {
+    "cli-argument-helper": "^0.0.8",
     "glob": "10.x"
   },
   "scripts": {
-    "build:es": "rm -rfv es && npx tsc --module ESNext --outDir es",
-    "test": "npx tsc && yarn run build:es && node . --set-es-paths --es-folder es --include \"*.js\""
+    "build:es": "rm -rfv es && npx tsc --module ESNext --outDir __es__",
+    "test": "npx tsc && yarn run build:es && node . --set-es-paths --es-folder __es__ --include index.js"
   },
   "bin": "./index.js",
   "browser": {
